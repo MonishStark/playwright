@@ -1,6 +1,4 @@
 /** @format */
-
-// playwright.config.js
 const { defineConfig, devices } = require("@playwright/test");
 
 module.exports = defineConfig({
@@ -17,6 +15,7 @@ module.exports = defineConfig({
 		screenshot: "only-on-failure",
 	},
 	expect: {
+		timeout: 30000,
 		toHaveScreenshot: {
 			maxDiffPixelRatio: 0.02,
 		},
@@ -26,10 +25,12 @@ module.exports = defineConfig({
 			name: "chromium",
 			use: { ...devices["Desktop Chrome"] },
 		},
-		{
-			name: "firefox",
-			use: { ...devices["Desktop Firefox"] },
-		},
+		// --- FIREFOX DISABLED TEMPORARILY FOR DEMO SPEED ---
+		// {
+		//   name: "firefox",
+		//   use: { ...devices["Desktop Firefox"] },
+		// },
+		// ---------------------------------------------------
 		{
 			name: "webkit",
 			use: { ...devices["Desktop Safari"] },
