@@ -17,7 +17,7 @@ The suite uses a **parallelized test architecture** for speed and reliability.
 Tests are split into two independent specifications to allow **concurrent execution**.
 
 | File                          | Description                                   | Scope                              |
-| ----------------------------- | --------------------------------------------- | ---------------------------------- |
+| :---------------------------- | :-------------------------------------------- | :--------------------------------- |
 | `tests/public.spec.js`        | Validates public-facing marketing pages       | 12 URLs                            |
 | `tests/authenticated.spec.js` | Validates login flow and restricted dashboard | 11 internal pages (single session) |
 
@@ -30,8 +30,15 @@ Tests are split into two independent specifications to allow **concurrent execut
 - **Base URL:** `https://igotmind.ca`
 - **Execution Mode:** Fully parallel (`fullyParallel: true`)
 - **Workers:** 2 (one worker per spec file)
-- **Global Timeout:** 60 seconds
-- **Visual Tolerance:** `maxDiffPixelRatio: 0.02` (2%) to allow minor font/rendering differences
+- **Global Timeout:** 60 seconds (Default)
+- **Visual Tolerance:** `maxDiffPixelRatio: 0.02` (2%) to allow minor font/rendering differences.
+
+### Critical Overrides
+
+- **Authenticated Timeout:** Explicitly set to **10 Minutes** (`600,000ms`) in `authenticated.spec.js` to accommodate server latency on the Dashboard.
+- **Bot Evasion:** Login input uses a **100ms typing delay** to prevent Wordfence (403/503) blocking.
+
+---
 
 ## 4. Test Scope
 
@@ -50,13 +57,9 @@ Tests are split into two independent specifications to allow **concurrent execut
 - `/membership/front-of-line-membership/` – Membership Flow
 - `/purchase/` – Purchase Flow
 
----
+### B. Authenticated Journey (Dashboard)
 
-### B. Authenticated Journey
-
-#### Dashboard Pages Covered
-
-- `/my-courses/`
+- `/my-courses/` (Dashboard)
 - My Courses
 - My Grades
 - My Memberships
@@ -71,52 +74,73 @@ Tests are split into two independent specifications to allow **concurrent execut
 
 ---
 
+## 5. Execution Option A: Cloud Dashboard (Recommended)
+
+**For Support Team & Managers:** No installation required.
+
+1.  Navigate to the **GitHub Repository**.
+2.  Click the **Actions** tab at the top.
+3.  Select **QA Automation Suite** from the left sidebar.
+4.  Click the **Run workflow** button (right side).
+5.  Wait for completion (~25-30 mins on Free Tier).
+6.  Download the **`playwright-report`** artifact to view the results.
+
+> **Note on Credentials:** Cloud execution uses **GitHub Secrets**.
+> Ensure `TEST_EMAIL` and `TEST_PASSWORD` are configured in **Settings > Secrets and variables > Actions**.
+
 ---
 
-## 5. Installation & Setup
+## 6. Execution Option B: Local Setup (Developer Mode)
+
+**For Developers:** Follow these steps to run the suite on your own machine.
 
 ### Prerequisites
 
 - **Node.js** (v14 or higher)
 - **NPM** (included with Node.js)
 
----
-
-### Step 1: Clone Repository
+### Step 1: Clone & Install
 
 ```bash
-git clone https://github.com/sowlab/playwright-visual-suite.git
+git clone <REPOSITORY_URL>
 cd <REPOSITORY_FOLDER>
+
+# Install Dependencies
+npm install
+
+# Install Browser Drivers
+npx playwright install
 ```
 
----
+````
 
-### Step 2: Configure Environment Variables
+### Step 2: Configure Local Credentials
 
-Create a `.env` file in the project root with your test credentials
-
-Then edit `.env` and add your credentials:
+Create a `.env` file in the project root:
 
 ```env
-TEST_EMAIL=your_test_email@example.com
-TEST_PASSWORD=your_test_password
+TEST_EMAIL=test@gmail.com
+TEST_PASSWORD=your_secure_password
+
 ```
 
----
+### Step 3: Run Tests
 
-### Step 3: Run the Automated Setup & Tests (Windows)
-
-Simply run the batch file (double click on run-tests):
+Execute the full suite across all browsers:
 
 ```bash
-run-tests.bat
+npm run test
+
 ```
 
-This will automatically:
+### Optional Commands
 
-- Install all dependencies
-- Install Playwright browsers
-- Run all tests
-- Open the HTML report
+- **Update Snapshots:** `npm run update-snapshots` (Overwrites baseline images)
+- **View Report:** `npx playwright show-report`
 
 ---
+
+```
+
+```
+````
