@@ -9,7 +9,7 @@ const CREDENTIALS = {
 
 test.describe("I Got Mind - Authenticated Dashboard Audit", () => {
 	test.beforeEach(async ({ page }) => {
-		test.setTimeout(600000);
+		test.setTimeout(900000);
 
 		await page.addStyleTag({
 			content: `

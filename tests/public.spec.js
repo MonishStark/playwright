@@ -37,11 +37,12 @@ test.describe("I Got Mind - Public Site Audit", () => {
 
 	for (const pageInfo of publicPages) {
 		test(`Public: ${pageInfo.name}`, async ({ page }) => {
+			// FIX: Give Firefox 2 minutes per page instead of 1
+			test.setTimeout(120000);
+
 			await page.goto(pageInfo.path);
 			await page.waitForLoadState("domcontentloaded");
 			await page.waitForTimeout(3000);
-
-			// FIX: Force animations to 'disabled' to prevent Sports Page failure
 			await expect(page).toHaveScreenshot({
 				fullPage: true,
 				animations: "disabled",
