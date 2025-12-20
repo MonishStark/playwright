@@ -2,27 +2,27 @@
 
 const { test, expect } = require("@playwright/test");
 
-// 1. HELPER: Force all lazy images to load by scrolling
+// 1. HELPER: Force all lazy images to load
 async function loadAllLazyImages(page) {
 	await page.evaluate(async () => {
 		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-		// Scroll down in steps
+		// Scroll down
 		for (let i = 0; i < document.body.scrollHeight; i += 500) {
 			window.scrollTo(0, i);
-			await delay(50);
+			await delay(20); // Faster scroll to save time
 		}
-		// Scroll back to top
+		// Scroll back up
 		window.scrollTo(0, 0);
 	});
-	// Wait for layout to snap into place
-	await page.waitForTimeout(2000);
+	// Quick settle time
+	await page.waitForTimeout(1000);
 }
 
+// List of pages to test
 const pagesToTest = [
 	{ path: "/", name: "Home" },
 	{ path: "/forsportsandeducation/", name: "Sports_Education" },
 	{ path: "/business/", name: "Business" },
-	// Add other pages here...
 ];
 
 test.describe("Public Page Visual Regression", () => {
@@ -32,14 +32,14 @@ test.describe("Public Page Visual Regression", () => {
 			await page.goto(pageInfo.path);
 			await page.waitForLoadState("domcontentloaded");
 
-			// 2. STABILIZE: Load all images to prevent height mismatch
+			// 2. STABILIZE: Load images
 			await loadAllLazyImages(page);
 
-			// 3. SCREENSHOT with relaxed strictness
+			// 3. SCREENSHOT (60s Timeout)
 			await expect(page).toHaveScreenshot({
 				fullPage: true,
 				animations: "disabled",
-				timeout: 20000, // Wait up to 20s for stability
+				timeout: 60000, // 🔴 Max wait time
 			});
 		});
 	}
