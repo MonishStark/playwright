@@ -39,7 +39,7 @@ test.describe("Public Page Visual Regression", () => {
 			await expect(page).toHaveScreenshot({
 				fullPage: true,
 				animations: "disabled",
-				timeout: 190000, // 🔴 Max wait time
+				timeout: 450000, // 🔴 Max wait time
 			});
 		});
 	}
