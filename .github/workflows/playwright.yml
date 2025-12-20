@@ -27,13 +27,38 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright Tests
+        # 🔴 Continue even if tests fail, so we can send the email
+        continue-on-error: true
         run: npx playwright test --update-snapshots
-        # ✅ LOGIN FIX: Passes secrets to the test runner
         env:
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
-      # 1. DEPLOY REPORT
+      # 🔴 NEW STEP: Read the JSON file to get the numbers
+      - name: Calculate Test Stats
+        if: always()
+        run: |
+          node -e "
+            try {
+              const fs = require('fs');
+              // Check if report exists
+              if (fs.existsSync('./results.json')) {
+                const r = require('./results.json');
+                const passed = r.stats.expected + r.stats.flaky;
+                const failed = r.stats.unexpected;
+                // Save to Github Environment Variables
+                console.log('PASSED=' + passed);
+                console.log('FAILED=' + failed);
+              } else {
+                console.log('PASSED=0');
+                console.log('FAILED=Error');
+              }
+            } catch (e) {
+              console.log('PASSED=0');
+              console.log('FAILED=Crash');
+            }
+          " >> $GITHUB_ENV
+
       - name: Deploy to GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
@@ -42,7 +67,7 @@ jobs:
           publish_dir: ./playwright-report
           keep_files: true
 
-      # 2. SEND EMAIL (SMTP)
+      # 🔴 UPDATED EMAIL: Uses the numbers we calculated above
       - name: Send Email Notification
         if: always()
         uses: dawidd6/action-send-mail@v3
@@ -51,11 +76,15 @@ jobs:
           server_port: 465
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "QA Report: ${{ job.status }} - ${{ github.repository }}"
+          # Subject now shows: "QA Report: 20 Passed, 0 Failed"
+          subject: "QA Report: ${{ env.PASSED }} Passed, ${{ env.FAILED }} Failed - ${{ github.repository }}"
           body: |
-            QA Run Completed.
-            Status: ${{ job.status }}
+            QA Automation Run Completed.
 
-            🔗 REPORT LINK: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-          to: gsatoru0373@gmail.com
+            SUMMARY:
+            ✅ Passed: ${{ env.PASSED }}
+            ❌ Failed: ${{ env.FAILED }}
+
+            🔗 VIEW FULL REPORT: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          to: gsatoru0373@gmail.com, ripul.chhabra@sowlab.com
           from: QA Bot

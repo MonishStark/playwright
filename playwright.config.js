@@ -7,7 +7,7 @@ module.exports = defineConfig({
 	forbidOnly: !!process.env.CI,
 	retries: 0,
 	workers: process.env.CI ? 2 : undefined,
-	reporter: "html",
+	reporter: [["html"], ["json", { outputFile: "results.json" }]],
 	timeout: 3600000,
 
 	use: {
