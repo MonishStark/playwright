@@ -3,6 +3,9 @@
 name: QA Automation Suite
 on:
   workflow_dispatch:
+  schedule:
+    # 🔴 5:22 PM IST = 11:52 UTC
+    - cron: "54 11 * * *"
 
 permissions:
   contents: write
@@ -27,26 +30,22 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright Tests
-        # 🔴 Continue even if tests fail, so we can send the email
         continue-on-error: true
         run: npx playwright test --update-snapshots
         env:
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
-      # 🔴 NEW STEP: Read the JSON file to get the numbers
       - name: Calculate Test Stats
         if: always()
         run: |
           node -e "
             try {
               const fs = require('fs');
-              // Check if report exists
               if (fs.existsSync('./results.json')) {
                 const r = require('./results.json');
                 const passed = r.stats.expected + r.stats.flaky;
                 const failed = r.stats.unexpected;
-                // Save to Github Environment Variables
                 console.log('PASSED=' + passed);
                 console.log('FAILED=' + failed);
               } else {
@@ -67,7 +66,6 @@ jobs:
           publish_dir: ./playwright-report
           keep_files: true
 
-      # 🔴 UPDATED EMAIL: Uses the numbers we calculated above
       - name: Send Email Notification
         if: always()
         uses: dawidd6/action-send-mail@v3
@@ -76,7 +74,6 @@ jobs:
           server_port: 465
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
-          # Subject now shows: "QA Report: 20 Passed, 0 Failed"
           subject: "QA Report: ${{ env.PASSED }} Passed, ${{ env.FAILED }} Failed - ${{ github.repository }}"
           body: |
             QA Automation Run Completed.
@@ -86,5 +83,7 @@ jobs:
             ❌ Failed: ${{ env.FAILED }}
 
             🔗 VIEW FULL REPORT: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+
+            (Scheduled Run)
           to: gsatoru0373@gmail.com, ripul.chhabra@sowlab.com
           from: QA Bot
