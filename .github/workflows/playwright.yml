@@ -4,7 +4,6 @@ name: QA Automation Suite
 on:
   workflow_dispatch:
   schedule:
-    # 🔴 5:22 PM IST = 11:52 UTC
     - cron: "50 12 * * 6"
 
 permissions:
