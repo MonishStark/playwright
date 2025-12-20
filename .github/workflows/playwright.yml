@@ -28,6 +28,9 @@ jobs:
 
       - name: Run Playwright Tests
         run: npx playwright test --update-snapshots
+        env:
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
       # 1. DEPLOY REPORT
       - name: Deploy to GitHub Pages
@@ -38,17 +41,20 @@ jobs:
           publish_dir: ./playwright-report
           keep_files: true
 
-      # 2. THE NATIVE SUMMARY (Crucial Step)
-      # Since we can't put the link in the email, we put it here.
-      # When Ripul clicks the GitHub Notification, he sees this immediately.
-      - name: Output Report Link to Summary
+      # 2. SEND EMAIL
+      - name: Send Email Notification
         if: always()
-        run: |
-          echo "### 🚀 QA Automation Result: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ **Verification Complete**" >> $GITHUB_STEP_SUMMARY
-          echo "Tested on: iPhone 17, Galaxy S25, Desktop" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "👇👇👇" >> $GITHUB_STEP_SUMMARY
-          echo "## 🔗 [CLICK HERE TO VIEW LIVE REPORT](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
-          echo "👆👆👆" >> $GITHUB_STEP_SUMMARY
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "QA Report: ${{ job.status }} - ${{ github.repository }}"
+          body: |
+            QA Run Completed.
+            Status: ${{ job.status }}
+
+            🔗 REPORT LINK: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          to: gsatoru0373@gmail.com
+          from: QA Bot
