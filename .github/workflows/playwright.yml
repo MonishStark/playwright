@@ -2,7 +2,12 @@
 
 name: QA Automation Suite
 on:
-  workflow_dispatch: # Enables the "Run Workflow" button
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   test:
@@ -22,16 +27,34 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright Tests
-        # FIX: The --update-snapshots flag forces a PASS even if Linux images are missing
         run: npx playwright test --update-snapshots
         env:
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
-      - name: Upload Report
+      # 1. DEPLOY REPORT
+      - name: Deploy to GitHub Pages
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          keep_files: true
+
+      # 2. SEND EMAIL
+      - name: Send Email Notification
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "QA Report: ${{ job.status }} - ${{ github.repository }}"
+          body: |
+            QA Run Completed.
+            Status: ${{ job.status }}
+
+            🔗 REPORT LINK: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          to: gsatoru0373@gmail.com
+          from: QA Bot

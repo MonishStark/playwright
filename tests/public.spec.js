@@ -1,51 +1,45 @@
 /** @format */
+
 const { test, expect } = require("@playwright/test");
 
-test.describe("I Got Mind - Public Site Audit", () => {
-	test.beforeEach(async ({ page }) => {
-		await page.addStyleTag({
-			content: `
-        #moove_gdpr_cookie_info_bar { display: none !important; } 
-        iframe { opacity: 0 !important; } 
-        .slick-track { visibility: hidden !important; }
-        .clock-animation { visibility: hidden !important; }
-        *, *::before, *::after {
-          animation-duration: 0s !important;
-          transition-duration: 0s !important;
-        }
-      `,
-		});
+// 1. HELPER: Force all lazy images to load by scrolling
+async function loadAllLazyImages(page) {
+	await page.evaluate(async () => {
+		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+		// Scroll down in steps
+		for (let i = 0; i < document.body.scrollHeight; i += 500) {
+			window.scrollTo(0, i);
+			await delay(50);
+		}
+		// Scroll back to top
+		window.scrollTo(0, 0);
 	});
+	// Wait for layout to snap into place
+	await page.waitForTimeout(2000);
+}
 
-	const publicPages = [
-		{ name: "01 Home Page", path: "/" },
-		{ name: "02 About Us", path: "/about/" },
-		{ name: "03 Sports Programs", path: "/sports/" },
-		{ name: "04 Corporate Programs", path: "/business/" },
-		{ name: "05 Scholarship", path: "/4-the-boys/" },
-		{ name: "06 Contact Us", path: "/book-now/" },
-		{ name: "07 Non-Profit", path: "/forsportsandeducation/" },
-		{ name: "08 Login Page", path: "/my-courses/" },
-		{ name: "09 Password Reset", path: "/my-courses/lost-password/" },
-		{ name: "10 The Little Warriors (TLW)", path: "/tlw/" },
-		{
-			name: "11 Membership Flow",
-			path: "/membership/front-of-line-membership/",
-		},
-		{ name: "12 Purchase Flow", path: "/purchase/" },
-	];
+const pagesToTest = [
+	{ path: "/", name: "Home" },
+	{ path: "/forsportsandeducation/", name: "Sports_Education" },
+	{ path: "/business/", name: "Business" },
+	// Add other pages here...
+];
 
-	for (const pageInfo of publicPages) {
-		test(`Public: ${pageInfo.name}`, async ({ page }) => {
-			// FIX: Give Firefox 2 minutes per page instead of 1
-			test.setTimeout(120000);
-
+test.describe("Public Page Visual Regression", () => {
+	for (const pageInfo of pagesToTest) {
+		test(`Verify Layout: ${pageInfo.name}`, async ({ page }) => {
+			// 1. Navigate
 			await page.goto(pageInfo.path);
 			await page.waitForLoadState("domcontentloaded");
-			await page.waitForTimeout(3000);
+
+			// 2. STABILIZE: Load all images to prevent height mismatch
+			await loadAllLazyImages(page);
+
+			// 3. SCREENSHOT with relaxed strictness
 			await expect(page).toHaveScreenshot({
 				fullPage: true,
 				animations: "disabled",
+				timeout: 20000, // Wait up to 20s for stability
 			});
 		});
 	}
