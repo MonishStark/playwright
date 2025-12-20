@@ -29,7 +29,17 @@ module.exports = defineConfig({
 	projects: [
 		// 1. DESKTOP BASELINE (Keep WebKit here, it is stable on Desktop)
 		{ name: "Desktop Chrome", use: { ...devices["Desktop Chrome"] } },
-		{ name: "Desktop Safari", use: { ...devices["Desktop Safari"] } },
+		{
+			name: "Desktop Safari",
+			use: {
+				browserName: "chromium", // <--- THE KEY FIX
+				channel: "chrome",
+				viewport: { width: 1280, height: 720 },
+				// We use a Mac User Agent so the site delivers the Mac layout
+				userAgent:
+					"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+			},
+		},
 
 		// 2. iPHONE 17 FAMILY (🔴 CHANGED TO CHROMIUM TO PREVENT CRASH)
 		{
