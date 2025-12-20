@@ -83,7 +83,7 @@ Tests are split into two independent specifications to allow **concurrent execut
 3.  Select **QA Automation Suite** from the left sidebar.
 4.  Click the **Run workflow** button (right side).
 5.  Wait for completion (~25-30 mins on Free Tier).
-6.  Download the **`playwright-report`** artifact to view the results.
+6.  The report would be shared to your provided mail.
 
 > **Note on Credentials:** Cloud execution uses **GitHub Secrets**.
 > Ensure `TEST_EMAIL` and `TEST_PASSWORD` are configured in **Settings > Secrets and variables > Actions**.
