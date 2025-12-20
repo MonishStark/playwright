@@ -35,7 +35,7 @@ module.exports = defineConfig({
 		{
 			name: "iPhone 17",
 			use: {
-				browserName: "chromium", // <--- CRASH FIX
+				browserName: "chromium", // <--- THE FIX
 				channel: "chrome",
 				viewport: { width: 393, height: 852 },
 				deviceScaleFactor: 1,
@@ -48,7 +48,7 @@ module.exports = defineConfig({
 		{
 			name: "iPhone 17 Pro",
 			use: {
-				browserName: "chromium", // <--- CRASH FIX
+				browserName: "chromium", // <--- THE FIX
 				channel: "chrome",
 				viewport: { width: 393, height: 852 },
 				deviceScaleFactor: 1,
@@ -61,7 +61,7 @@ module.exports = defineConfig({
 		{
 			name: "iPhone 17 Pro Max",
 			use: {
-				browserName: "chromium", // <--- CRASH FIX
+				browserName: "chromium", // <--- THE FIX
 				channel: "chrome",
 				viewport: { width: 430, height: 932 },
 				deviceScaleFactor: 1,
@@ -111,11 +111,11 @@ module.exports = defineConfig({
 			},
 		},
 
-		// 4. TABLETS (🔴 CHANGED TO CHROMIUM TO PREVENT CRASH)
+		// 4. TABLETS (🔴 CHANGED TO CHROMIUM)
 		{
 			name: "iPad Pro 11-inch",
 			use: {
-				browserName: "chromium", // <--- CRASH FIX
+				browserName: "chromium", // <--- THE FIX
 				channel: "chrome",
 				viewport: { width: 834, height: 1194 },
 				deviceScaleFactor: 1,
