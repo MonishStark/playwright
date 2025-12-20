@@ -84,5 +84,5 @@ jobs:
             🔗 VIEW FULL REPORT: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
 
             (Scheduled Run)
-          to: gsatoru0373@gmail.com, ripul.chhabra@sowlab.com
+          to: gsatoru0373@gmail.com
           from: QA Bot
