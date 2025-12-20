@@ -28,6 +28,7 @@ jobs:
 
       - name: Run Playwright Tests
         run: npx playwright test --update-snapshots
+        # ✅ LOGIN FIX: Passes secrets to the test runner
         env:
           TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
@@ -41,7 +42,7 @@ jobs:
           publish_dir: ./playwright-report
           keep_files: true
 
-      # 2. SEND EMAIL
+      # 2. SEND EMAIL (SMTP)
       - name: Send Email Notification
         if: always()
         uses: dawidd6/action-send-mail@v3
@@ -56,5 +57,5 @@ jobs:
             Status: ${{ job.status }}
 
             🔗 REPORT LINK: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-          to: gsatoru0373@gmail.com
+          to: gsatoru0373@gmail.com, ripul.chhabra@sowlab.com
           from: QA Bot

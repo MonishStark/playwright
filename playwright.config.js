@@ -5,10 +5,10 @@ module.exports = defineConfig({
 	testDir: "./tests",
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
-	retries: 0, // No retries to save time
+	retries: 0,
 	workers: process.env.CI ? 2 : undefined,
 	reporter: "html",
-	timeout: 3600000, // 60 Minutes Global Timeout
+	timeout: 3600000,
 
 	use: {
 		baseURL: "https://igotmind.ca",
@@ -16,31 +16,31 @@ module.exports = defineConfig({
 		screenshot: "only-on-failure",
 	},
 
-	// 🔴 STABILITY SETTINGS
 	expect: {
 		timeout: 30000,
 		toHaveScreenshot: {
-			maxDiffPixelRatio: 0.05, // Allow 5% noise
+			maxDiffPixelRatio: 0.05,
 			threshold: 0.3,
-			timeout: 60000, // 🔴 60 Seconds (Fixes the Timeout Error)
+			timeout: 60000,
 			animations: "disabled",
 		},
 	},
 
 	projects: [
-		// 1. DESKTOP BASELINE
+		// 1. DESKTOP BASELINE (Keep WebKit here, it is stable on Desktop)
 		{ name: "Desktop Chrome", use: { ...devices["Desktop Chrome"] } },
 		{ name: "Desktop Safari", use: { ...devices["Desktop Safari"] } },
 
-		// 2. iPHONE 17 FAMILY (Optimized Scale: 1)
+		// 2. iPHONE 17 FAMILY (🔴 CHANGED TO CHROMIUM TO PREVENT CRASH)
 		{
 			name: "iPhone 17",
 			use: {
-				browserName: "webkit",
+				browserName: "chromium", // <--- CRASH FIX
+				channel: "chrome",
 				viewport: { width: 393, height: 852 },
 				deviceScaleFactor: 1,
 				isMobile: true,
-				hasTouch: true, // Scale 1 prevents crash
+				hasTouch: true,
 				userAgent:
 					"Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/19.0 Mobile/15E148 Safari/604.1",
 			},
@@ -48,7 +48,8 @@ module.exports = defineConfig({
 		{
 			name: "iPhone 17 Pro",
 			use: {
-				browserName: "webkit",
+				browserName: "chromium", // <--- CRASH FIX
+				channel: "chrome",
 				viewport: { width: 393, height: 852 },
 				deviceScaleFactor: 1,
 				isMobile: true,
@@ -60,7 +61,8 @@ module.exports = defineConfig({
 		{
 			name: "iPhone 17 Pro Max",
 			use: {
-				browserName: "webkit",
+				browserName: "chromium", // <--- CRASH FIX
+				channel: "chrome",
 				viewport: { width: 430, height: 932 },
 				deviceScaleFactor: 1,
 				isMobile: true,
@@ -70,7 +72,7 @@ module.exports = defineConfig({
 			},
 		},
 
-		// 3. SAMSUNG S25 FAMILY (Optimized Scale: 1)
+		// 3. SAMSUNG S25 FAMILY
 		{
 			name: "Galaxy S25",
 			use: {
@@ -109,11 +111,12 @@ module.exports = defineConfig({
 			},
 		},
 
-		// 4. TABLETS (Optimized Scale: 1)
+		// 4. TABLETS (🔴 CHANGED TO CHROMIUM TO PREVENT CRASH)
 		{
 			name: "iPad Pro 11-inch",
 			use: {
-				browserName: "webkit",
+				browserName: "chromium", // <--- CRASH FIX
+				channel: "chrome",
 				viewport: { width: 834, height: 1194 },
 				deviceScaleFactor: 1,
 				isMobile: true,
