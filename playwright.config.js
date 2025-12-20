@@ -12,7 +12,7 @@ module.exports = defineConfig({
 
 	use: {
 		baseURL: "https://igotmind.ca",
-		trace: "on",
+		trace: "on-first-retry",
 		screenshot: "on",
 	},
 
