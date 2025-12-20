@@ -13,7 +13,7 @@ module.exports = defineConfig({
 	use: {
 		baseURL: "https://igotmind.ca",
 		trace: "on-first-retry",
-		screenshot: "only-on-failure",
+		screenshot: "on",
 	},
 
 	expect: {
